@@ -1,37 +1,50 @@
+# app/controllers/calendars_controller.rb
 class CalendarsController < ApplicationController
-  # １週間のカレンダーと予定が表示されるページ
-  def index
+  # 週間のカレンダーと予定を取得するメソッド
+  def get_week(start_date)
     wdays = ['(日)', '(月)', '(火)', '(水)', '(木)', '(金)', '(土)']
+    week_days = []
 
-    @todays_date = Date.today
-
-    @week_days = []
-
-    plans = Plan.where(date: @todays_date..@todays_date + 6)
+    plans = Plan.where(date: start_date..start_date + 6)
 
     7.times do |x|
       today_plans = []
       plans.each do |plan|
-        today_plans.push(plan.plan) if plan.date == @todays_date + x
+        today_plans.push(plan.plan) if plan.date == start_date + x
       end
 
-      day = @todays_date + x
+      day = start_date + x
       days = {
         month: day.month,
         date: day.day,
         day_of_week: wdays[day.wday], # 曜日を取得して追加
         plans: today_plans
       }
-      @week_days.push(days)
+      week_days.push(days)
     end
 
+    week_days
+  end
+
+  # １週間のカレンダーと予定が表示されるページ
+  def index
+    @todays_date = Date.today
+    @week_days = get_week(@todays_date)
     @plan = Plan.new
   end
 
   # 予定の保存
   def create
-    Plan.create(plan_params)
-    redirect_to action: :index
+    @plan = Plan.new(plan_params)
+    if @plan.save
+      redirect_to action: :index
+    else
+      # 保存が失敗した場合の処理
+      # 例えば、エラーメッセージを表示するなど
+      @todays_date = Date.today
+      @week_days = get_week(@todays_date)
+      render :index
+    end
   end
 
   private
