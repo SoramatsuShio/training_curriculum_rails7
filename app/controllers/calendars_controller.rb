@@ -1,5 +1,6 @@
 class CalendarsController < ApplicationController
   # １週間のカレンダーと予定が表示されるページ
+
   def index
     wdays = ['(日)','(月)','(火)','(水)','(木)','(金)','(土)']
 
@@ -17,10 +18,10 @@ class CalendarsController < ApplicationController
 
       day = @todays_date + x
       days = {
-        :month => day.month,
-        :date => day.day,
-        :day_of_week => wdays[day.wday], # 曜日を取得して追加
-        :plans => today_plans
+        month: day.month,
+        date: day.day,
+        day_of_week: wdays[day.wday], # 曜日を取得して追加
+        plans: today_plans
       }
       @week_days.push(days)
     end
